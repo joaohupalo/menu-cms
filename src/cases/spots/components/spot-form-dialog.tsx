@@ -48,7 +48,7 @@ export function SpotFormDialog({ open, onOpenChange, spot }: SpotFormDialogProps
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
-                <form onSubmit={handleSubmit} className="grid gap-4">
+                <form onSubmit={handleSubmit} noValidate className="grid gap-4">
                     <DialogHeader>
                         <DialogTitle>{isEditing ? "Editar mesa" : "Nova mesa"}</DialogTitle>
                     </DialogHeader>
