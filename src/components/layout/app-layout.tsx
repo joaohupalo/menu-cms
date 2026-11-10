@@ -1,11 +1,12 @@
 import { NavLink, Outlet } from "react-router-dom"
-import { ClipboardList, LayoutGrid, MapPin, UtensilsCrossed } from "lucide-react"
+import { ClipboardList, Kanban, LayoutGrid, MapPin, UtensilsCrossed } from "lucide-react"
 import { cn } from "cn"
 import logomarca from "@/assets/logomarca.svg"
 
 // Itens do menu lateral: caminho da rota, texto e ícone
 const menuItems = [
   { to: "/comandas", label: "Comandas", icon: ClipboardList },
+  { to: "/pedidos", label: "Pedidos (Kanban)", icon: Kanban },
   { to: "/categorias", label: "Categorias", icon: LayoutGrid },
   { to: "/produtos", label: "Produtos", icon: UtensilsCrossed },
   { to: "/mesas", label: "Mesas", icon: MapPin },

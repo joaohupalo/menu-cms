@@ -23,6 +23,7 @@ export interface OrderDTO {
     guestCheck: {
         id: string;
         createdAt: string;
+        status: "OPENED" | "CLOSED";
         spot: SpotDTO;
     };
 }
