@@ -1,75 +1,106 @@
-# React + TypeScript + Vite
+# menu-cms
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+CMS (sistema de gerenciamento de conteúdo) do restaurante **Mater Burguer**. É a interface administrativa usada pela equipe para gerenciar o cardápio digital e acompanhar os pedidos.
 
-Currently, two official plugins are available:
+O CMS consome a API NestJS (`menu-backend`) desenvolvida no primeiro bimestre. Nenhum dado fica fixo no código: tudo vem da API.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Funcionalidades
 
-## React Compiler
+| Área | O que faz |
+|---|---|
+| **Categorias** | Listar, cadastrar, editar e excluir (nome, ícone, ordem de exibição e situação) |
+| **Produtos** | Listar, cadastrar, editar e excluir, com filtro por categoria, preço em reais e indicadores de vegetariano e novidade |
+| **Mesas** | Listar, cadastrar, editar e excluir |
+| **Comandas** | Listar as comandas em aberto (mesa, data de abertura e total acumulado) e abrir o detalhe de cada uma |
+| **Pedidos** | Ver os pedidos de uma comanda (itens, quantidades, preços e totais) e alterar o status |
+| **Kanban** (bônus) | Quadro com uma coluna por status; arrastar um cartão altera o status do pedido na API |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Todas as telas tratam os estados de carregamento, erro e lista vazia. Cada cadastro, edição, exclusão ou alteração de status mostra uma mensagem (toast) de sucesso ou erro.
 
-## Expanding the ESLint configuration
+## Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Vite** + **React** + **TypeScript**
+- **Tailwind CSS** + **shadcn/ui**
+- **Axios**: uma única instância (`src/lib/axios.ts`), com o `baseURL` lido de `VITE_API_URL`
+- **TanStack Query**: `useQuery` para as leituras e `useMutation` para as gravações, com `invalidateQueries` após o sucesso
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Como executar
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Pré-requisitos
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js 20.19 ou superior
+- O `menu-backend` rodando, por padrão em `http://localhost:3000`
 
+### Passos
+
+```bash
+# 1. Instalar as dependências
+npm install
+
+# 2. Criar o arquivo de variáveis de ambiente a partir do exemplo
+cp .env.example .env
+
+# 3. Rodar em modo de desenvolvimento
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Depois, acesse `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Variáveis de ambiente
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Variável | Descrição | Exemplo |
+|---|---|---|
+| `VITE_API_URL` | Endereço da API (menu-backend) | `http://localhost:3000` |
+
+## Estrutura do projeto
+
+O projeto segue a mesma organização do `menu-frontend` trabalhado em sala:
 
 ```
+src/
+├── cases/                  # um módulo por área do sistema
+│   ├── categories/
+│   ├── products/
+│   ├── spots/              # mesas
+│   ├── guest-checks/       # comandas
+│   └── orders/             # pedidos e Kanban
+│       ├── components/     # componentes da área (formulários, cartões...)
+│       ├── dtos/           # tipos dos dados da API
+│       ├── hooks/          # useQuery / useMutation (TanStack Query)
+│       └── services/       # chamadas à API (Axios)
+├── components/
+│   ├── layout/             # menu lateral
+│   ├── ui/                 # componentes do shadcn/ui
+│   ├── confirm-delete-dialog.tsx
+│   └── list-state.tsx      # estados de carregando / erro / vazio
+├── lib/
+│   ├── axios.ts            # instância única do Axios
+│   ├── api-error.ts        # mensagem de erro da API para os toasts
+│   └── format.ts           # formatação de moeda (R$) e data
+└── pages/                  # uma página por rota
+```
+
+O caminho dos dados é sempre o mesmo: **página → hook (TanStack Query) → service (Axios) → API**.
+
+## Dependências fora da stack obrigatória
+
+| Dependência | Justificativa |
+|---|---|
+| `sonner` | É a biblioteca usada pelo componente de toast do shadcn/ui (`npx shadcn add sonner`). Mostra as mensagens de sucesso e erro após cada operação. |
+| `next-themes` | Instalada automaticamente pelo componente `sonner` do shadcn/ui, que a usa para seguir o tema claro/escuro. |
+| `@dnd-kit/core` | Arrastar e soltar (drag and drop) dos cartões no Kanban de pedidos (bônus). Biblioteca permitida no enunciado. |
+
+Já eram usadas no `menu-frontend` em sala: `react-router-dom` (rotas e menu de navegação), `lucide-react` (ícones) e `cn` (junção de classes CSS). As demais (`@base-ui/react`, `class-variance-authority`, `tw-animate-css`, `@fontsource-variable/*`) são dependências do próprio shadcn/ui e do Tailwind.
+
+## Rotas da API utilizadas
+
+| Método | Rota | Uso |
+|---|---|---|
+| GET, POST, PATCH, DELETE | `/categories` | Categorias |
+| GET, POST, PATCH, DELETE | `/products` (`?categoryId=`) | Produtos e filtro por categoria |
+| GET, POST, PATCH, DELETE | `/spots` | Mesas |
+| GET | `/guest-checks?status=OPENED` e `/guest-checks/:id` | Comandas em aberto e detalhe |
+| GET | `/orders` (`?guestCheckId=`) | Pedidos (de uma comanda ou todos, no Kanban) |
+| PATCH | `/orders/:id/status` | Alteração de status do pedido |
+
+Para atender ao CMS, o `menu-backend` foi atualizado com os campos `icon` e `displayOrder` em categorias, os campos `vegetarian` e `isNew` em produtos, a listagem de comandas com o total acumulado, o filtro de pedidos por comanda e as transições livres entre os status (`NEW`, `PREPARING`, `READY`, `DELIVERED`).
