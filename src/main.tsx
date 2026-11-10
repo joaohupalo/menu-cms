@@ -6,7 +6,13 @@ import { Toaster } from '@/components/ui/sonner'
 import App from './App.tsx'
 import './index.css'
 
-const queryClient = new QueryClient()
+// retry: 1 -> se a API falhar, tenta só mais uma vez antes de mostrar o erro
+// (o padrão são 3 tentativas, e a tela ficaria vários segundos em "Carregando...")
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: 1 },
+  },
+})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

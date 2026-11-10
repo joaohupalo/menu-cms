@@ -4,6 +4,7 @@ import { CategoriesPage } from "./pages/categories-page"
 import { ProductsPage } from "./pages/products-page"
 import { SpotsPage } from "./pages/spots-page"
 import { GuestChecksPage } from "./pages/guest-checks-page"
+import { GuestCheckDetailPage } from "./pages/guest-check-detail-page"
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/produtos" element={<ProductsPage />} />
         <Route path="/mesas" element={<SpotsPage />} />
         <Route path="/comandas" element={<GuestChecksPage />} />
+        <Route path="/comandas/:id" element={<GuestCheckDetailPage />} />
       </Route>
     </Routes>
   )
